@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="280dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
@@ -21,7 +21,7 @@
             <ImageView
                 android:id="@+id/ivImage"
                 android:layout_width="wrap_content"
-                android:layout_height="150dp"
+                android:layout_height="180dp"
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/vegbean" />
 
@@ -33,7 +33,7 @@
                 android:background="@drawable/recipe_gradient"
                 android:fontFamily="casual"
                 android:gravity="center"
-                android:text="Bean and halloumi stew"
+                android:text="@string/bean_and_halloumi_stew"
                 android:textColor="#FFFFFF"
                 android:textSize="21sp" />
 
@@ -46,9 +46,10 @@
                 android:background="@drawable/recipe_gradient"
                 android:fontFamily="casual"
                 android:gravity="center"
-                android:text="TextView"
+                android:text="@string/textview"
                 android:textColor="#FFFFFF"
                 android:textSize="21sp" />
+
 
 
         </LinearLayout>

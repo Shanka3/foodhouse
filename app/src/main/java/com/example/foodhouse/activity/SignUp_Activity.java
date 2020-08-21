@@ -1,5 +1,6 @@
 package com.example.foodhouse.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -7,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +26,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class SignUp_Activity extends AppCompatActivity {
 
@@ -34,8 +33,8 @@ public class SignUp_Activity extends AppCompatActivity {
     EditText name,phone,emailid,passwordid;
     Button signup;
     TextView create;
+    ProgressDialog progressDialog;
     FirebaseAuth firebaseAuth;
-    ProgressBar progressBar;
     FirebaseFirestore firebaseFirestore;
     String userID;
 
@@ -53,11 +52,15 @@ public class SignUp_Activity extends AppCompatActivity {
         signup = findViewById(R.id.signupRegister);
         create = findViewById(R.id.account);
 
+        progressDialog = new ProgressDialog(this);
+
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        progressBar = findViewById(R.id.progressBar);
 
-
+        if (firebaseAuth.getCurrentUser() != null) {
+            finish();
+            startActivity(new Intent(getApplicationContext(),RecipeActivity.class));
+        }
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +69,17 @@ public class SignUp_Activity extends AppCompatActivity {
                 String Pass = passwordid.getText().toString().trim();
                 final String uname = name.getText().toString();
                 final String number = phone.getText().toString();
+
+                if (TextUtils.isEmpty(uname)){
+                    name.setError("Name Is Required");
+                    return;
+                }
+
+                if (TextUtils.isEmpty(number)){
+                    phone.setError("Phone Number Is Required");
+                    return;
+                }
+
 
                 if (TextUtils.isEmpty(Mail)){
                     emailid.setError("Email Is Required");
@@ -82,7 +96,8 @@ public class SignUp_Activity extends AppCompatActivity {
                     return;
                 }
 
-                progressBar.setVisibility(View.VISIBLE);
+                progressDialog.setMessage("Creating Account...");
+                progressDialog.show();
 
                 firebaseAuth.createUserWithEmailAndPassword(Mail,Pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -107,10 +122,12 @@ public class SignUp_Activity extends AppCompatActivity {
                                     Log.d(TAG, "onFailure: " + e.toString());
                                 }
                             });
+                            finish();
                             startActivity(new Intent(getApplicationContext(),RecipeActivity.class));
                         }else {
                             Toast.makeText(SignUp_Activity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            progressBar.setVisibility(View.GONE);
+                            progressDialog.dismiss();
+
                         }
                     }
                 });
@@ -126,7 +143,6 @@ public class SignUp_Activity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), SignIn_Activity.class));
             }
         });
-
 
     }
 }

@@ -1,5 +1,6 @@
 package com.example.foodhouse.activity;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +8,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,16 +23,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.Objects;
-
 public class SignIn_Activity extends AppCompatActivity {
 
     EditText email,password;
     TextView create,forgotlink;
     Button signin;
     FirebaseAuth firebaseAuth;
-    ProgressBar progressBar;
-
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +44,14 @@ public class SignIn_Activity extends AppCompatActivity {
         create = findViewById(R.id.account);
         forgotlink = findViewById(R.id.forgot);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        progressBar = findViewById(R.id.progressBar);
+        progressDialog = new ProgressDialog(this);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        if (firebaseAuth.getCurrentUser() != null) {
+            finish();
+            startActivity(new Intent(getApplicationContext(),RecipeActivity.class));
+        }
 
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,17 +74,20 @@ public class SignIn_Activity extends AppCompatActivity {
                     return;
                 }
 
-                progressBar.setVisibility(View.VISIBLE);
+                progressDialog.setMessage("Logging In...");
+                progressDialog.show();
 
-                firebaseAuth.signInWithEmailAndPassword(mail,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                firebaseAuth.signInWithEmailAndPassword(mail,pass).addOnCompleteListener(
+                        new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
+                            finish();
                             Toast.makeText(SignIn_Activity.this, "Logged In Successfully", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(getApplicationContext(),RecipeActivity.class));
                         }else {
                             Toast.makeText(SignIn_Activity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
+                            progressDialog.dismiss();
                         }
                     }
                 });
@@ -138,8 +143,5 @@ public class SignIn_Activity extends AppCompatActivity {
                 passwordResetDialog.create().show();
             }
         });
-
-
-
     }
 }

@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodhouse.activity.RecipeActivity;
+import com.example.foodhouse.activity.RecipesActivity;
 import com.example.foodhouse.activity.SignIn_Activity;
 import com.example.foodhouse.activity.SignUp_Activity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,11 +34,10 @@ public class MainActivity extends AppCompatActivity {
         skip = findViewById(R.id.skiper);
         firebaseAuth = FirebaseAuth.getInstance();
 
-        /*if (firebaseAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), RecipeActivity.class));
+        if (firebaseAuth.getCurrentUser() != null) {
             finish();
+            startActivity(new Intent(getApplicationContext(), RecipeActivity.class));
         }
-*/
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), RecipeActivity.class));
+                startActivity(new Intent(getApplicationContext(), RecipesActivity.class));
             }
         });
 

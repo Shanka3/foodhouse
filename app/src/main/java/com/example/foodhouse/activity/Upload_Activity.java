@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,6 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -29,11 +31,11 @@ import java.util.Calendar;
 
 public class Upload_Activity extends AppCompatActivity {
 
-    ImageView recipeImage;
-    Uri uri;
-    EditText txt_name,txt_description;
-    String imageUrl;
-
+   private ImageView recipeImage;
+   private Uri uri;
+   private EditText txt_name,txt_description;
+   private String imageUrl;
+   private String publisher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,16 +99,32 @@ public class Upload_Activity extends AppCompatActivity {
     }
 
     public void btnUploadRecipe(View view) {
+        String upName = txt_name.getText().toString().trim();
+        String upDescription = txt_description.getText().toString().trim();
 
-        uploadImage();
+        if (uri == null) {
+            Toast.makeText(this, "Image Not Selected", Toast.LENGTH_LONG).show();
+        }else if (TextUtils.isEmpty(upName)){
+            txt_name.setError("Recipe Name Is Empty");
+            return;
+        }else if (TextUtils.isEmpty(upDescription)){
+            txt_description.setError("Description Is Empty");
+            return;
+        } else uploadImage();
+
+
     }
 
     public void uploadRecipe() {
 
+        publisher = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
        FoodData foodData = new FoodData(
                txt_name.getText().toString(),
                txt_description.getText().toString(),
-               imageUrl
+               imageUrl,
+               publisher
+
         );
 
         String myCurrentDateTime = DateFormat.getDateTimeInstance()

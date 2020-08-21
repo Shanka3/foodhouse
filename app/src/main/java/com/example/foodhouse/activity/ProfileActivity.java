@@ -1,18 +1,20 @@
 package com.example.foodhouse.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodhouse.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,8 +26,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-
-import java.util.Objects;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -36,6 +39,8 @@ public class ProfileActivity extends AppCompatActivity {
     FirebaseFirestore firebaseFirestore;
     String userID;
     FirebaseUser user;
+    ImageView profileImageStored;
+    StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
         phone = findViewById(R.id.PHONE);
         email = findViewById(R.id.EMAIL);
         resetpass = findViewById(R.id.resetbtn);
+        profileImageStored = findViewById(R.id.profileImagesss);
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -65,6 +71,15 @@ public class ProfileActivity extends AppCompatActivity {
                 } else {
                     Log.d(TAG, "onEvent: Document do not exist");
                 }
+            }
+        });
+
+        storageReference = FirebaseStorage.getInstance().getReference();
+        StorageReference profileRef = storageReference.child("user/"+firebaseAuth.getCurrentUser().getUid()+"/profile.jpg");
+        profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.get().load(uri).into(profileImageStored);
             }
         });
 
