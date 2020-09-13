@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.foodhouse.R;
 import com.example.foodhouse.activity.DetailActivity;
+import com.example.foodhouse.activity.DetailMethodActivity;
 import com.example.foodhouse.model.FoodData;
 
 import java.util.ArrayList;
@@ -52,8 +53,9 @@ public class MyAdapter extends RecyclerView.Adapter<FoodViewHolder> {
       //foodViewHolder.imageView.setImageResource(myFoodList.get(i).getItemImage());
         foodViewHolder.mTitle.setText(myFoodList.get(i).getItemName());
         foodViewHolder.mDescription.setText(myFoodList.get(i).getItemDescription());
+        foodViewHolder.mMethod.setText(myFoodList.get(i).getItemMethod());
 
-        foodViewHolder.mCardView.setOnClickListener(new View.OnClickListener() {
+        foodViewHolder.mDescription.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, DetailActivity.class);
@@ -61,6 +63,18 @@ public class MyAdapter extends RecyclerView.Adapter<FoodViewHolder> {
                 intent.putExtra("Image",myFoodList.get(foodViewHolder.getAdapterPosition()).getItemImage());
                 intent.putExtra("Description",myFoodList.get(foodViewHolder.getAdapterPosition()).getItemDescription());
                // intent.putExtra("postKey",myFoodList.get(foodViewHolder.getAdapterPosition()).getPublisher());
+                mContext.startActivity(intent);
+            }
+        });
+
+        foodViewHolder.mMethod.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, DetailMethodActivity.class);
+                intent.putExtra("RecipeName",myFoodList.get(foodViewHolder.getAdapterPosition()).getItemName());
+                intent.putExtra("Image",myFoodList.get(foodViewHolder.getAdapterPosition()).getItemImage());
+                intent.putExtra("Method",myFoodList.get(foodViewHolder.getAdapterPosition()).getItemMethod());
+                // intent.putExtra("postKey",myFoodList.get(foodViewHolder.getAdapterPosition()).getPublisher());
                 mContext.startActivity(intent);
             }
         });
@@ -97,7 +111,7 @@ public class MyAdapter extends RecyclerView.Adapter<FoodViewHolder> {
  class FoodViewHolder extends RecyclerView.ViewHolder{
 
     ImageView imageView;
-    TextView mTitle,mDescription;
+    TextView mTitle,mDescription,mMethod;
     CardView mCardView;
 
     public FoodViewHolder(@NonNull View itemView) {
@@ -106,6 +120,7 @@ public class MyAdapter extends RecyclerView.Adapter<FoodViewHolder> {
         imageView = itemView.findViewById(R.id.ivImage);
         mTitle = itemView.findViewById(R.id.tvTitle);
         mDescription = itemView.findViewById(R.id.tvDescription);
+        mMethod = itemView.findViewById(R.id.tvMethod);
 
         mCardView = itemView.findViewById(R.id.myCardView);
 

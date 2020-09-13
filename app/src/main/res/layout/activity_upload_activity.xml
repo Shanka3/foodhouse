@@ -30,10 +30,18 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description"
+            android:hint="Ingredients"
             android:layout_marginTop="12dp"
             android:textSize="21sp"
             android:id="@+id/txt_Description"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Preparation"
+            android:layout_marginTop="12dp"
+            android:textSize="21sp"
+            android:id="@+id/txt_method"/>
 
         <Button
             android:layout_width="match_parent"

@@ -34,7 +34,7 @@ public class Upload_Activity extends AppCompatActivity {
 
     private ImageView recipeImage;
     private Uri uri;
-    private EditText txt_name, txt_description;
+    private EditText txt_name, txt_description, txt_method;
     private String imageUrl;
     private String publisher;
 
@@ -47,6 +47,7 @@ public class Upload_Activity extends AppCompatActivity {
         recipeImage = (ImageView) findViewById(R.id.iv_foodImage);
         txt_name = (EditText) findViewById(R.id.txt_Recipe_Name);
         txt_description = (EditText) findViewById(R.id.txt_Description);
+        txt_method = (EditText) findViewById(R.id.txt_method);
 
     }
 
@@ -101,7 +102,8 @@ public class Upload_Activity extends AppCompatActivity {
     public void btnUploadRecipe(View view) {
         String upName = txt_name.getText().toString().trim();
         String upDescription = txt_description.getText().toString().trim();
-        Pattern regex = Pattern.compile("[$&+,:;=\\\\?@#|'<>.^*()%!-]");
+        String upMethod = txt_method.getText().toString().trim();
+        Pattern regex = Pattern.compile("[$+:;=\\\\?@#|<>^*%!]");
 
         if (uri == null) {
             Toast.makeText(this, "Image Not Selected", Toast.LENGTH_SHORT).show();
@@ -117,6 +119,12 @@ public class Upload_Activity extends AppCompatActivity {
         } else if (regex.matcher(upDescription).find()) {
             txt_description.setError("SpecialCharacters Not Allowed");
             return;
+        } else if (TextUtils.isEmpty(upMethod)) {
+            txt_method.setError("Preparation Is Empty");
+            return;
+        } else if (regex.matcher(upMethod).find()) {
+            txt_method.setError("SpecialCharacters Not Allowed");
+            return;
         } else uploadImage();
     }
 
@@ -127,6 +135,7 @@ public class Upload_Activity extends AppCompatActivity {
         FoodData foodData = new FoodData(
                 txt_name.getText().toString(),
                 txt_description.getText().toString(),
+                txt_method.getText().toString(),
                 imageUrl,
                 publisher
 
