@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -50,10 +51,8 @@ public class MyAdapter extends RecyclerView.Adapter<FoodViewHolder> {
                 .into(foodViewHolder.imageView);
 
 
-      //foodViewHolder.imageView.setImageResource(myFoodList.get(i).getItemImage());
+
         foodViewHolder.mTitle.setText(myFoodList.get(i).getItemName());
-        foodViewHolder.mDescription.setText(myFoodList.get(i).getItemDescription());
-        foodViewHolder.mMethod.setText(myFoodList.get(i).getItemMethod());
 
         foodViewHolder.mDescription.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +110,8 @@ public class MyAdapter extends RecyclerView.Adapter<FoodViewHolder> {
  class FoodViewHolder extends RecyclerView.ViewHolder{
 
     ImageView imageView;
-    TextView mTitle,mDescription,mMethod;
+    TextView mTitle;
+    Button mDescription,mMethod;
     CardView mCardView;
 
     public FoodViewHolder(@NonNull View itemView) {

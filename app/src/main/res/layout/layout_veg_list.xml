@@ -37,30 +37,38 @@
                 android:textColor="#FFFFFF"
                 android:textSize="21sp" />
 
-            <TextView
-                android:id="@+id/tvDescription"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="26dp"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/recipe_gradient"
-                android:fontFamily="casual"
-                android:gravity="center"
-                android:text="TextView"
-                android:textColor="#FFFFFF"
-                android:textSize="21sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/tvDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/recipe_gradient"
+                    android:text="Ingredients"
+                    android:textColor="#FFFFFF"
+                    android:textSize="21sp" />
 
-            <TextView
-                android:id="@+id/tvMethod"
-                android:layout_width="match_parent"
-                android:layout_height="26dp"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="6dp"
-                android:background="@drawable/recipe_gradient"
-                android:fontFamily="casual"
-                android:gravity="center"
-                android:text="Methods"
-                android:textColor="#FFFFFF"
-                android:textSize="21sp" />
+                <Button
+                    android:id="@+id/tvMethod"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@drawable/recipe_gradient"
+                    android:text="Methods"
+                    android:textColor="#FFFFFF"
+                    android:textSize="21sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
