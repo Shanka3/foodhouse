@@ -20,7 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -36,7 +36,8 @@ public class Upload_Activity extends AppCompatActivity {
     private Uri uri;
     private EditText txt_name, txt_description, txt_method;
     private String imageUrl;
-    private String publisher;
+    private String post;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,22 +131,28 @@ public class Upload_Activity extends AppCompatActivity {
 
     public void uploadRecipe() {
 
-        publisher = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String myCurrentDateTime = DateFormat.getDateTimeInstance()
+                .format(Calendar.getInstance().getTime());
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myref = database.getReference("Recipe").child(myCurrentDateTime);
+
+          post = myref.getKey();
+
 
         FoodData foodData = new FoodData(
                 txt_name.getText().toString(),
                 txt_description.getText().toString(),
                 txt_method.getText().toString(),
                 imageUrl,
-                publisher
+                post
+
+
 
         );
 
-        String myCurrentDateTime = DateFormat.getDateTimeInstance()
-                .format(Calendar.getInstance().getTime());
 
-        FirebaseDatabase.getInstance().getReference("Recipe")
-                .child(myCurrentDateTime).setValue(foodData).addOnCompleteListener(new OnCompleteListener<Void>() {
+                myref.setValue(foodData).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 

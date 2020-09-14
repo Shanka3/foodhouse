@@ -6,17 +6,17 @@ public class FoodData {
     private String itemDescription;
     private String itemMethod;
     private String itemImage;
-    private String publisher;
+    private String postKey;
 
     public FoodData() {
     }
 
-    public FoodData(String itemName, String itemDescription, String itemMethod, String itemImage, String publisher) {
+    public FoodData(String itemName, String itemDescription, String itemMethod, String itemImage, String postKey) {
         this.itemName = itemName;
         this.itemDescription = itemDescription;
         this.itemMethod = itemMethod;
         this.itemImage = itemImage;
-        this.publisher = publisher;
+        this.postKey = postKey;
     }
 
     public String getItemName() {
@@ -32,7 +32,11 @@ public class FoodData {
     public String getItemImage() {
         return itemImage;
     }
-    public String getPublisher() {
-        return publisher;
+    public String getPostKey() {
+        return postKey;
+    }
+
+    public void setPostKey(String postKey) {
+        this.postKey = postKey;
     }
 }

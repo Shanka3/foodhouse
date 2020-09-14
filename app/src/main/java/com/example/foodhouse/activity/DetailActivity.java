@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,16 +14,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.foodhouse.R;
 import com.example.foodhouse.adapter.CommentAdapter;
 import com.example.foodhouse.model.Comment;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -30,32 +30,27 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity {
 
     RecyclerView mCommentRecyclerView;
     List<Comment> mComment;
 
-    private TextView foodDescription,foodName, ratingsUsers;
-    private ImageView foodImage;
+     TextView foodDescription,foodName, ratingsUsers;
+     ImageView foodImage;
     private EditText userComments;
     private Button userPost;
-    private  String publisherID;
-    private String publisherName;
-    private DocumentReference documentReference;
-    private FirebaseFirestore firebaseFirestore;
-    private FirebaseAuth firebaseAuth;
-    private String userID;
+    FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
-    DatabaseReference databaseReference;
-    ValueEventListener eventListener;
+    private String PostKey;
+    FirebaseDatabase firebaseDatabase;
+    CommentAdapter commentAdapter;
+    static String COMMENT_KEY = "Comments";
 
 
     @Override
@@ -71,6 +66,10 @@ public class DetailActivity extends AppCompatActivity {
         foodImage = (ImageView)findViewById(R.id.ivImage2);
         userComments = (EditText)findViewById(R.id.comment);
         userPost = (Button)findViewById(R.id.post);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseDatabase = FirebaseDatabase.getInstance();
 
         mCommentRecyclerView = (RecyclerView)findViewById(R.id.rv_Comment);
         userPost.setEnabled(false);
@@ -96,6 +95,32 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        userPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                userPost.setVisibility(View.INVISIBLE);
+                DatabaseReference  commentReference = firebaseDatabase.getReference(COMMENT_KEY).child(PostKey).push();
+                String comment_content = userComments.getText().toString();
+                String publisherID = firebaseUser.getUid();
+                Comment comment = new Comment(comment_content,publisherID);
+
+                commentReference.setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(DetailActivity.this, "Comment Added", Toast.LENGTH_SHORT).show();
+                        userComments.setText("");
+                        userPost.setVisibility(View.VISIBLE);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(DetailActivity.this, "Fail To Add Comment", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
 
         Bundle bundle = getIntent().getExtras();
 
@@ -108,74 +133,9 @@ public class DetailActivity extends AppCompatActivity {
                     .into(foodImage);
         }
 
-        userPost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        PostKey = getIntent().getExtras().getString("postKey");
 
-                userPost.setVisibility(View.INVISIBLE);
-                firebaseFirestore = FirebaseFirestore.getInstance();
-                firebaseAuth = FirebaseAuth.getInstance();
-                userID = firebaseAuth.getCurrentUser().getUid();
-                documentReference = firebaseFirestore.collection("users").document(userID);
-
-
-                publisherID = firebaseAuth.getCurrentUser().getUid();
-                    Comment comment = new Comment(
-                        userComments.getText().toString(),
-                        publisherID,
-                        publisherName
-                );
-
-                String myCurrentDateTime = DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-
-                FirebaseDatabase.getInstance().getReference("Comments").child(myCurrentDateTime).setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(DetailActivity.this, "Comment Added", Toast.LENGTH_SHORT).show();
-                            userComments.setText("");
-                            userPost.setVisibility(View.VISIBLE);
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(DetailActivity.this, "Error !" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(DetailActivity.this,1);
-        mCommentRecyclerView.setLayoutManager(gridLayoutManager);
-
-        mComment = new ArrayList<>();
-
-        final CommentAdapter commentAdapter = new CommentAdapter(DetailActivity.this,mComment);
-        mCommentRecyclerView.setAdapter(commentAdapter);
-
-        databaseReference = FirebaseDatabase.getInstance().getReference("Comments");
-
-        eventListener = databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-               // mComment.clear();
-
-                for (DataSnapshot itemSnapshot: snapshot.getChildren()){
-
-                    Comment comment = itemSnapshot.getValue(Comment.class);
-
-                    mComment.add(comment);
-                }
-
-               commentAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        iniRvComment();
 
         ratingsUsers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,6 +144,40 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void iniRvComment() {
+
+        mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        DatabaseReference commentRef = firebaseDatabase.getReference(COMMENT_KEY).child(PostKey);
+        commentRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mComment = new ArrayList<>();
+                for (DataSnapshot snap:snapshot.getChildren()) {
+
+                    Comment comment = snap.getValue(Comment.class);
+                    mComment.add(comment);
+                }
+
+                commentAdapter = new CommentAdapter(getApplicationContext(),mComment);
+                mCommentRecyclerView.setAdapter(commentAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private String timeStampToString(long time) {
+
+        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
+        calendar.setTimeInMillis(time);
+        String date = DateFormat.format("dd-MM-yyyy",calendar).toString();
+        return date;
     }
 
 }

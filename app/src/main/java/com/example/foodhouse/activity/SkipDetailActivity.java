@@ -6,13 +6,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.foodhouse.R;
 import com.example.foodhouse.adapter.CommentAdapter;
 import com.example.foodhouse.model.Comment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,8 +31,14 @@ public class SkipDetailActivity extends AppCompatActivity {
 
     TextView foodDescription,foodName;
     ImageView foodImage;
-    DatabaseReference databaseReference;
-    ValueEventListener eventListener;
+
+    FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
+    private String PostKey;
+    FirebaseDatabase firebaseDatabase;
+    CommentAdapter commentAdapter;
+    static String COMMENT_KEY = "Comments";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +51,10 @@ public class SkipDetailActivity extends AppCompatActivity {
         foodName = (TextView)findViewById(R.id.txtRecipeName);
         foodDescription = (TextView)findViewById(R.id.txtDescription);
         foodImage = (ImageView)findViewById(R.id.ivImage2);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseDatabase = FirebaseDatabase.getInstance();
 
         mCommentRecyclerView = (RecyclerView)findViewById(R.id.rv_Comment);
 
@@ -57,30 +69,29 @@ public class SkipDetailActivity extends AppCompatActivity {
                     .load(bundle.getString("Image"))
                     .into(foodImage);
         }
+        PostKey = getIntent().getExtras().getString("postKey");
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(SkipDetailActivity.this,1);
-        mCommentRecyclerView.setLayoutManager(gridLayoutManager);
+        iniRvComment();
 
-        mComment = new ArrayList<>();
+    }
 
-        final CommentAdapter commentAdapter = new CommentAdapter(SkipDetailActivity.this,mComment);
-        mCommentRecyclerView.setAdapter(commentAdapter);
+    private void iniRvComment() {
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("Comments");
+        mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        eventListener = databaseReference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference commentRef = firebaseDatabase.getReference(COMMENT_KEY).child(PostKey);
+        commentRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // mComment.clear();
+                mComment = new ArrayList<>();
+                for (DataSnapshot snap:snapshot.getChildren()) {
 
-                for (DataSnapshot itemSnapshot: snapshot.getChildren()){
-
-                    Comment comment = itemSnapshot.getValue(Comment.class);
-
+                    Comment comment = snap.getValue(Comment.class);
                     mComment.add(comment);
                 }
 
-                commentAdapter.notifyDataSetChanged();
+                commentAdapter = new CommentAdapter(getApplicationContext(),mComment);
+                mCommentRecyclerView.setAdapter(commentAdapter);
             }
 
             @Override
@@ -88,7 +99,5 @@ public class SkipDetailActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
 }
